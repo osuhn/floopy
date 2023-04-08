@@ -3,6 +3,7 @@ import '#root/config';
 import '@kaname-png/plugin-subcommands-advanced/register';
 import { PrismaClient } from '@prisma/client';
 import { container } from '@sapphire/pieces';
+import '@lavaclient/queue/register';
 import '@sapphire/plugin-logger/register';
 
 import * as colorette from 'colorette';

@@ -1,17 +1,15 @@
 import { rootFolder } from '#utils/constants';
 import { LogLevel } from '@sapphire/framework';
 import { setup } from '@skyra/env-utilities';
-import { ClientOptions, IntentsBitField, Options } from 'discord.js';
+import { ClientOptions, Options, GatewayIntentBits } from 'discord.js';
 import { join } from 'node:path';
 
 setup(join(rootFolder, 'src', '.env'));
 
-const { Flags } = IntentsBitField;
-
 export const CLIENT_OPTIONS: ClientOptions = {
 	disableMentionPrefix: false,
 	defaultPrefix: ';',
-	intents: [Flags.GuildMessages, Flags.MessageContent, Flags.Guilds],
+	intents: [GatewayIntentBits.GuildMessages, GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
 	makeCache: Options.cacheEverything(),
 	loadDefaultErrorListeners: process.env.NODE_ENV !== 'production',
 	logger: { level: process.env.NODE_ENV === 'production' ? LogLevel.Info : LogLevel.Debug },

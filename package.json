@@ -24,6 +24,8 @@
 	},
 	"dependencies": {
 		"@kaname-png/plugin-subcommands-advanced": "^2.2.1",
+		"@lavaclient/queue": "^2.1.1",
+		"@lavaclient/spotify": "^3.1.0",
 		"@prisma/client": "^4.11.0",
 		"@sapphire/decorators": "^6.0.0",
 		"@sapphire/discord.js-utilities": "^6.0.3",
@@ -36,11 +38,13 @@
 		"@skyra/env-utilities": "^1.1.0",
 		"colorette": "^2.0.19",
 		"discord.js": "^14.7.1",
+		"lavaclient": "^4.1.1",
 		"tslib": "^2.5.0"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^17.4.4",
 		"@commitlint/config-conventional": "^17.4.4",
+		"@lavaclient/types": "^2.1.1",
 		"@sapphire/eslint-config": "^4.3.8",
 		"@sapphire/prettier-config": "^1.4.5",
 		"@sapphire/ts-config": "^3.3.4",

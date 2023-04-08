@@ -8,7 +8,9 @@ import { inspect } from 'node:util';
 @ApplyOptions<Command.Options>({
 	description: 'Evaluates JavaScript code',
 	aliases: ['e'],
-	preconditions: ['OwnerOnly']
+	preconditions: ['OwnerOnly'],
+	flags: ['async', 'depth', 'hidden', 'silent'],
+	options: ['depth']
 })
 export class UserCommand extends Command {
 	public override async messageRun(message: Message, args: Args) {

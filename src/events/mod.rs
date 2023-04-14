@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use lavalink_rs::{gateway::LavalinkEventHandler, LavalinkClient, model::{TrackStart, TrackFinish}};
 use poise::serenity_prelude::{self as serenity, Mutex, RwLock, ShardManager, UserId};
 use tracing::info;
 
@@ -73,5 +74,18 @@ impl serenity::EventHandler for Handler<Arc<RwLock<FloopyData>>> {
 	async fn interaction_create(&self, ctx: serenity::Context, interaction: serenity::Interaction) {
 		self.dispatch_poise_event(&ctx, &poise::Event::InteractionCreate { interaction })
 			.await;
+	}
+}
+
+pub struct LavalinkHandler;
+
+#[serenity::async_trait]
+impl LavalinkEventHandler for LavalinkHandler {
+	async fn track_start(&self, _client: LavalinkClient, event: TrackStart) {
+		info!("Track started!\nGuild: {}", event.guild_id);
+	}
+
+	async fn track_finish(&self, _client: LavalinkClient, event: TrackFinish) {
+		info!("Track finished!\nGuild: {}", event.guild_id);
 	}
 }

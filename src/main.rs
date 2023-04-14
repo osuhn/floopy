@@ -4,7 +4,8 @@ mod commands;
 mod events;
 
 use commands::*;
-use events::Handler;
+use events::{Handler, LavalinkHandler};
+use lavalink_rs::LavalinkClient;
 use poise::serenity_prelude::{self as serenity, RwLock};
 use std::{
 	collections::{HashMap, HashSet},
@@ -21,10 +22,13 @@ impl serenity::TypeMapKey for FloopyData {
 
 pub struct FloopyData {
 	pub queue: HashMap<String, String>,
+	pub lavalink: LavalinkClient,
 }
 
 #[tokio::main]
 async fn main() {
+	let token = var("DISCORD_TOKEN").expect("Expected a token in the environment");
+
 	// load .env file
 	dotenv::dotenv().ok();
 
@@ -34,11 +38,32 @@ async fn main() {
 	let mut owners = HashSet::new();
 	owners.insert(serenity::UserId(462780441594822687));
 
-	let mut commands = vec![register(), help::help(), ping::ping()];
+	let mut commands = vec![register(), help::help(), ping::ping(), player::play::play()];
 	poise::set_qualified_names(&mut commands);
+
+	let http = serenity::Http::new(&token);
+
+	let bot_id = match http.get_current_application_info().await {
+		Ok(info) => info.id,
+		Err(why) => panic!("Could not access application info: {:?}", why),
+	};
+
+	let lava_client = LavalinkClient::builder(bot_id.0)
+		.set_host(var("LAVALINK_HOST").expect("Expected a host in the environment"))
+		.set_password(var("LAVALINK_PASSWORD").expect("Expected a password in the environment"))
+		.set_port(
+			var("LAVALINK_PORT")
+				.expect("Expected a port in the environment")
+				.parse::<u16>()
+				.expect("Expected a valid port"),
+		)
+		.build(LavalinkHandler)
+		.await
+		.expect("Failed to build Lavalink client");
 
 	let data = Arc::new(RwLock::new(FloopyData {
 		queue: HashMap::new(),
+		lavalink: lava_client,
 	}));
 
 	let handler = Arc::new(Handler::new(

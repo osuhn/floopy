@@ -1,14 +1,10 @@
-use std::time::SystemTime;
-
 use crate::{FloopyContext, FloopyError};
 
 #[poise::command(slash_command)]
 pub async fn ping(ctx: FloopyContext<'_>) -> Result<(), FloopyError> {
-	let initial = SystemTime::now();
-
+	let initial = ctx.created_at();
 	let reply = ctx.send(|f| f.content("Pong!")).await?;
-
-	let elapsed = initial.elapsed().unwrap();
+	let elapsed = reply.message().await.unwrap().timestamp - initial;
 
 	reply
 		.edit(ctx, |m| {

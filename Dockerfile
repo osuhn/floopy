@@ -8,13 +8,9 @@ RUN apt-get update && apt-get install -y \
 WORKDIR "/floopy"
 
 # Cache cargo build dependencies by creating a dummy source
-RUN mkdir src
-RUN echo "fn main() {}" > src/main.rs
+COPY src ./src
 COPY Cargo.toml ./
 COPY Cargo.lock ./
-RUN cargo build --release --locked
-
-COPY . .
 RUN cargo build --release --locked
 
 # Release image

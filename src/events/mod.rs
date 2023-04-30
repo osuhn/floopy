@@ -1,7 +1,6 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
-use lavalink_rs::{gateway::LavalinkEventHandler, LavalinkClient, model::{TrackStart, TrackFinish}};
-use poise::serenity_prelude::{self as serenity, Mutex, RwLock, ShardManager, UserId};
+use poise::serenity_prelude::{self as serenity, Activity, Mutex, RwLock, ShardManager, UserId};
 use tracing::info;
 
 use crate::{FloopyData, FloopyError};
@@ -65,8 +64,17 @@ impl serenity::EventHandler for Handler<Arc<RwLock<FloopyData>>> {
 			.await;
 	}
 
-	async fn ready(&self, _ctx: serenity::Context, ready: serenity::Ready) {
+	async fn ready(&self, ctx: serenity::Context, ready: serenity::Ready) {
 		*self.bot_id.write().await = Some(ready.user.id);
+
+		// change activity
+		tokio::spawn(async move {
+			loop {
+				ctx.set_activity(Activity::playing("with your feelings"))
+					.await;
+				tokio::time::sleep(Duration::from_secs(60)).await;
+			}
+		});
 
 		info!("{} is ready", ready.user.name)
 	}
@@ -74,18 +82,5 @@ impl serenity::EventHandler for Handler<Arc<RwLock<FloopyData>>> {
 	async fn interaction_create(&self, ctx: serenity::Context, interaction: serenity::Interaction) {
 		self.dispatch_poise_event(&ctx, &poise::Event::InteractionCreate { interaction })
 			.await;
-	}
-}
-
-pub struct LavalinkHandler;
-
-#[serenity::async_trait]
-impl LavalinkEventHandler for LavalinkHandler {
-	async fn track_start(&self, _client: LavalinkClient, event: TrackStart) {
-		info!("Track started!\nGuild: {}", event.guild_id);
-	}
-
-	async fn track_finish(&self, _client: LavalinkClient, event: TrackFinish) {
-		info!("Track finished!\nGuild: {}", event.guild_id);
 	}
 }

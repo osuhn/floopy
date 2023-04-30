@@ -1,34 +1,32 @@
 #![warn(clippy::str_to_string)]
 
 mod commands;
+mod error;
 mod events;
+mod shared;
 
 use commands::*;
-use events::{Handler, LavalinkHandler};
-use lavalink_rs::LavalinkClient;
+use events::Handler;
 use poise::serenity_prelude::{self as serenity, RwLock};
-use std::{
-	collections::{HashMap, HashSet},
-	env::var,
-	sync::Arc,
-};
+use songbird::SerenityInit;
+use std::{collections::HashSet, env::var, sync::Arc};
 
-type FloopyError = Box<dyn std::error::Error + Send + Sync>;
-type FloopyContext<'a> = poise::Context<'a, Arc<RwLock<FloopyData>>, FloopyError>;
+pub use self::error::Error;
+
+pub type FloopyError = Box<dyn std::error::Error + Send + Sync>;
+pub type FloopyContext<'a> = poise::Context<'a, Arc<RwLock<FloopyData>>, FloopyError>;
+pub type Result<R> = core::result::Result<R, Error>;
 
 impl serenity::TypeMapKey for FloopyData {
 	type Value = Arc<RwLock<FloopyData>>;
 }
 
 pub struct FloopyData {
-	pub queue: HashMap<String, String>,
-	pub lavalink: LavalinkClient,
+	pub songbird: Arc<songbird::Songbird>,
 }
 
 #[tokio::main]
 async fn main() {
-	let token = var("DISCORD_TOKEN").expect("Expected a token in the environment");
-
 	// load .env file
 	dotenv::dotenv().ok();
 
@@ -41,29 +39,8 @@ async fn main() {
 	let mut commands = vec![register(), help::help(), ping::ping(), player::play::play()];
 	poise::set_qualified_names(&mut commands);
 
-	let http = serenity::Http::new(&token);
-
-	let bot_id = match http.get_current_application_info().await {
-		Ok(info) => info.id,
-		Err(why) => panic!("Could not access application info: {:?}", why),
-	};
-
-	let lava_client = LavalinkClient::builder(bot_id.0)
-		.set_host(var("LAVALINK_HOST").expect("Expected a host in the environment"))
-		.set_password(var("LAVALINK_PASSWORD").expect("Expected a password in the environment"))
-		.set_port(
-			var("LAVALINK_PORT")
-				.expect("Expected a port in the environment")
-				.parse::<u16>()
-				.expect("Expected a valid port"),
-		)
-		.build(LavalinkHandler)
-		.await
-		.expect("Failed to build Lavalink client");
-
 	let data = Arc::new(RwLock::new(FloopyData {
-		queue: HashMap::new(),
-		lavalink: lava_client,
+		songbird: songbird::Songbird::serenity(),
 	}));
 
 	let handler = Arc::new(Handler::new(
@@ -105,6 +82,7 @@ async fn main() {
 			| serenity::GatewayIntents::GUILD_MESSAGES
 			| serenity::GatewayIntents::GUILD_INTEGRATIONS,
 	)
+	.register_songbird()
 	.event_handler_arc(handler.clone())
 	.await
 	.unwrap();

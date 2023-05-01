@@ -1,6 +1,6 @@
 use crate::{FloopyContext, FloopyError};
 
-#[poise::command(slash_command)]
+#[poise::command(slash_command, prefix_command)]
 pub async fn ping(ctx: FloopyContext<'_>) -> Result<(), FloopyError> {
 	let initial = ctx.created_at().timestamp_millis();
 	let reply = ctx.send(|f| f.content("Pong!")).await?;

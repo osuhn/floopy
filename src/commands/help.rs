@@ -1,6 +1,6 @@
 use crate::{FloopyContext, FloopyError};
 
-#[poise::command(slash_command)]
+#[poise::command(slash_command, prefix_command)]
 pub async fn help(
 	ctx: FloopyContext<'_>,
 	#[description = "Specific command to show help about"]

@@ -54,7 +54,7 @@ async fn main() {
 			owners,
 			commands,
 			prefix_options: poise::PrefixFrameworkOptions {
-				prefix: Some(";;".into()),
+				prefix: Some(";".into()),
 				edit_tracker: Some(poise::EditTracker::for_timespan(
 					std::time::Duration::from_secs(3600),
 				)),

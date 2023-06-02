@@ -36,7 +36,13 @@ async fn main() {
 	let mut owners = HashSet::new();
 	owners.insert(serenity::UserId(462780441594822687));
 
-	let mut commands = vec![register(), help::help(), ping::ping(), player::play::play()];
+	let mut commands = vec![
+		register(),
+		help::command(),
+		ping::command(),
+		player::play::command(),
+		player::skip::command(),
+	];
 	poise::set_qualified_names(&mut commands);
 
 	let data = Arc::new(RwLock::new(FloopyData {
@@ -48,7 +54,7 @@ async fn main() {
 			owners,
 			commands,
 			prefix_options: poise::PrefixFrameworkOptions {
-				prefix: Some(";".into()),
+				prefix: Some(";;".into()),
 				edit_tracker: Some(poise::EditTracker::for_timespan(
 					std::time::Duration::from_secs(3600),
 				)),

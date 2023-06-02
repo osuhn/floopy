@@ -8,9 +8,11 @@ name = "floopy"
 path = "src/main.rs"
 
 [profile.release]
+strip = true
 opt-level = "s"
 lto = true
 codegen-units = 1
+panic = "abort"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

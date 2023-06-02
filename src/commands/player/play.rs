@@ -12,8 +12,15 @@ use songbird::{
 use crate::{shared::join_channel, FloopyContext, FloopyError};
 use url::Url;
 
-#[poise::command(prefix_command, slash_command, ephemeral = true)]
-pub async fn play(
+#[poise::command(
+	prefix_command,
+	slash_command,
+	ephemeral = true,
+	rename = "play",
+	aliases("p", "pl"),
+	guild_only
+)]
+pub async fn command(
 	ctx: FloopyContext<'_>,
 	#[description = "The song to play"]
 	#[rest]

@@ -12,6 +12,10 @@ pub async fn command(ctx: FloopyContext<'_>) -> Result<(), FloopyError> {
 	ctx.defer().await?;
 
 	let (_guild_id, _channel_id, conn, _manager) = join_channel(&ctx).await?;
+	if conn.lock().await.queue().is_empty() {
+		ctx.send(|r| r.content("There is no song to skip.")).await?;
+		return Ok(());
+	}
 
 	let _ = conn.lock().await.queue().skip();
 

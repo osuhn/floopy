@@ -42,6 +42,7 @@ async fn main() {
 		ping::command(),
 		player::play::command(),
 		player::skip::command(),
+		player::leave::command(),
 	];
 	poise::set_qualified_names(&mut commands);
 

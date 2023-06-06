@@ -1,4 +1,4 @@
-use crate::{shared::join_channel, FloopyContext, FloopyError};
+use crate::{shared::get_conn, FloopyContext, FloopyError};
 
 #[poise::command(
 	prefix_command,
@@ -11,13 +11,15 @@ use crate::{shared::join_channel, FloopyContext, FloopyError};
 pub async fn command(ctx: FloopyContext<'_>) -> Result<(), FloopyError> {
 	ctx.defer().await?;
 
-	let (_guild_id, _channel_id, conn, _manager) = join_channel(&ctx).await?;
-	if conn.lock().await.queue().is_empty() {
+	let conn = get_conn(&ctx).await?;
+	let driver = conn.lock().await;
+
+	if driver.queue().is_empty() {
 		ctx.send(|r| r.content("There is no song to skip.")).await?;
 		return Ok(());
 	}
 
-	let _ = conn.lock().await.queue().skip();
+	let _ = driver.queue().skip();
 
 	ctx.send(|r| r.content("Skipped the current song.")).await?;
 

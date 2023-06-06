@@ -1,5 +1,6 @@
 use crate::{shared::get_conn, FloopyContext, FloopyError};
 
+/// Leaves the current voice channel.
 #[poise::command(
 	prefix_command,
 	slash_command,

@@ -1,5 +1,6 @@
 use crate::{FloopyContext, FloopyError};
 
+/// Shows a list of commands or help for a specific command.
 #[poise::command(
 	slash_command,
 	prefix_command,
@@ -15,7 +16,7 @@ pub async fn command(
 ) -> Result<(), FloopyError> {
 	let bottom_text = format!(
 		"\
-Type {:?}help command for more info on a command.
+Type {}help command for more info on a command.
 You can edit your message to the bot and the bot will edit its response.",
 		ctx.prefix(),
 	);

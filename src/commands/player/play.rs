@@ -12,6 +12,7 @@ use songbird::{
 use crate::{shared::join_channel, FloopyContext, FloopyError};
 use url::Url;
 
+/// Plays a song.
 #[poise::command(
 	prefix_command,
 	slash_command,

@@ -3,6 +3,7 @@ use crate::{
 	FloopyContext, FloopyError,
 };
 
+/// Leaves the current voice channel.
 #[poise::command(
 	prefix_command,
 	slash_command,

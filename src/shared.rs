@@ -45,6 +45,9 @@ pub async fn join_channel(
 			}
 			return Err(err.into());
 		}
+
+		conn.lock().await.deafen(true).await?;
+
 		conn
 	};
 

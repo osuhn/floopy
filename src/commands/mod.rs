@@ -1,4 +1,5 @@
 use crate::{FloopyContext, FloopyError};
+use serenity::{builder::CreateEmbed, utils::Color};
 
 pub mod help;
 pub mod ping;
@@ -9,4 +10,8 @@ pub async fn register(ctx: FloopyContext<'_>) -> Result<(), FloopyError> {
 	print!("Registering commands... ");
 	poise::builtins::register_application_commands_buttons(ctx).await?;
 	Ok(())
+}
+
+pub fn base_embed(e: &mut CreateEmbed) -> &mut CreateEmbed {
+	e.color(Color::BLURPLE)
 }

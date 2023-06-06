@@ -43,6 +43,7 @@ async fn main() {
 		player::play::command(),
 		player::skip::command(),
 		player::leave::command(),
+		player::queue::command(),
 	];
 	poise::set_qualified_names(&mut commands);
 

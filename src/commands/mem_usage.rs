@@ -16,8 +16,8 @@ pub async fn command(ctx: FloopyContext<'_>) -> Result<(), FloopyError> {
 	if let Ok(pid) = sysinfo::get_current_pid() {
 		if let Some(process) = sys.process(pid) {
 			let process_info = format!(
-				"Memory Usage: {} MB\nCPU Usage: {}%",
-				process.memory() / 1000000,
+				"Memory Usage: {}\nCPU Usage: {}%",
+				format_bytes(process.memory()),
 				process.cpu_usage().round(),
 			);
 
@@ -26,4 +26,23 @@ pub async fn command(ctx: FloopyContext<'_>) -> Result<(), FloopyError> {
 	}
 
 	Ok(())
+}
+
+fn format_bytes(bytes: u64) -> String {
+	if bytes == 0 {
+		return String::from("0 bytes");
+	}
+
+	let k: u64 = 1024;
+	#[allow(unused_comparisons)]
+	let sizes = ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+	let mut i = 0;
+	let mut num = bytes as f64;
+
+	while num >= k as f64 && i < sizes.len() - 1 {
+		num /= k as f64;
+		i += 1;
+	}
+
+	format!("{} {}", num.round(), sizes[i])
 }

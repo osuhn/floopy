@@ -29,13 +29,13 @@ pub async fn command(
 ) -> Result<(), FloopyError> {
 	ctx.defer().await?;
 
+	let (guild_id, channel_id, conn, manager) = join_channel(&ctx).await?;
+
 	let source: Input = if let Ok(url) = Url::parse(&query) {
 		Restartable::ytdl(url, true).await?.into()
 	} else {
 		Restartable::ytdl_search(query, true).await?.into()
 	};
-
-	let (guild_id, channel_id, conn, manager) = join_channel(&ctx).await?;
 
 	let metadata = source.metadata.clone();
 

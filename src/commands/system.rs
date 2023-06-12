@@ -1,27 +1,43 @@
-use crate::{FloopyContext, FloopyError};
+use crate::{base_embed, constants::DOT, FloopyContext, FloopyError};
 use sysinfo::{ProcessExt, System, SystemExt};
 
-/// Displays the bot's memory usage.
+/// Shows some information about the system.
 #[poise::command(
 	slash_command,
 	prefix_command,
-	rename = "mem",
-	aliases("mu", "memusage", "mem_usage", "memory_usage")
+	rename = "system",
+	aliases("sys", "system_info", "sys_info")
 )]
 pub async fn command(ctx: FloopyContext<'_>) -> Result<(), FloopyError> {
 	let mut sys = System::new_all();
 
 	sys.refresh_memory();
+	sys.refresh_system();
 
 	if let Ok(pid) = sysinfo::get_current_pid() {
 		if let Some(process) = sys.process(pid) {
 			let process_info = format!(
-				"Memory Usage: {}\nCPU Usage: {}%",
+				"> {DOT} Memory Usage: **{}**\n> {DOT} CPU Usage: **{}%**\n> {DOT} Woke up: **<t:{}:R>**",
 				format_bytes(process.memory()),
 				process.cpu_usage().round(),
+				process.start_time()
 			);
 
-			ctx.send(|m| m.content(process_info)).await?;
+			ctx.send(|r| {
+				r.embed(|e| {
+					base_embed(e)
+						.title("System Info")
+						.description(process_info)
+						.thumbnail(
+							ctx.serenity_context()
+								.cache
+								.current_user()
+								.avatar_url()
+								.unwrap(),
+						)
+				})
+			})
+			.await?;
 		}
 	}
 

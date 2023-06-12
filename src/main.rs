@@ -1,6 +1,7 @@
 #![warn(clippy::str_to_string)]
 
 mod commands;
+mod constants;
 mod error;
 mod events;
 mod shared;
@@ -44,7 +45,7 @@ async fn main() {
 		player::skip::command(),
 		player::leave::command(),
 		player::queue::command(),
-		mem_usage::command(),
+		system::command(),
 	];
 	poise::set_qualified_names(&mut commands);
 

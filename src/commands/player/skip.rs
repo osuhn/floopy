@@ -1,6 +1,6 @@
 use crate::{shared::get_conn, FloopyContext, FloopyError};
 
-/// Leaves the current voice channel.
+/// Skips the current song.
 #[poise::command(
 	prefix_command,
 	slash_command,

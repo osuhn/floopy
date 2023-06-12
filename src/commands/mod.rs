@@ -2,7 +2,7 @@ use crate::{FloopyContext, FloopyError};
 use serenity::{builder::CreateEmbed, utils::Color};
 
 pub mod help;
-pub mod mem_usage;
+pub mod system;
 pub mod ping;
 pub mod player;
 

@@ -57,7 +57,7 @@ async fn main() {
 			owners,
 			commands,
 			prefix_options: poise::PrefixFrameworkOptions {
-				prefix: Some(":".into()),
+				prefix: Some(var("DISCORD_PREFIX").unwrap_or(";".to_string()).into()),
 				edit_tracker: Some(poise::EditTracker::for_timespan(
 					std::time::Duration::from_secs(3600),
 				)),

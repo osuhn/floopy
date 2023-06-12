@@ -34,7 +34,6 @@ fn format_bytes(bytes: u64) -> String {
 	}
 
 	let k: u64 = 1024;
-	#[allow(unused_comparisons)]
 	let sizes = ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
 	let mut i = 0;
 	let mut num = bytes as f64;

@@ -1,25 +1,27 @@
-# Build image
-# Necessary dependencies to build Parrot
-FROM rust:slim-bullseye as build
+FROM rustlang/rust:nightly as builder
+ENV RUSTFLAGS="-C target-cpu=skylake"
 
-RUN apt-get update && apt-get install -y \
-    build-essential autoconf automake cmake libtool libssl-dev pkg-config
+WORKDIR /floopy
 
-WORKDIR "/floopy"
+RUN apt-get update && apt-get install -y cmake libtool libssl-dev && apt-get clean
 
-# Cache cargo build dependencies by creating a dummy source
-COPY src ./src
-COPY Cargo.toml ./
-COPY Cargo.lock ./
+# This is a dummy build to get the dependencies cached.
+COPY Cargo.toml Cargo.lock ./
+RUN mkdir src && \
+    echo "// dummy file" > src/lib.rs && \
+    cargo build --release && \
+    rm -r src
+
+# This is the actual build, copy in the rest of the sources
+COPY . .
 RUN cargo build --release --locked
 
-# Release image
-# Necessary dependencies to run Parrot
-FROM debian:bullseye-slim as runner
+# Now make the runtime container
+FROM debian:bullseye-slim
 
-RUN apt-get update && apt-get install -y python3-pip ffmpeg
-RUN pip install -U yt-dlp
+RUN apt-get update && apt-get upgrade -y && apt-get install -y ca-certificates python3-pip ffmpeg && pip install -U yt-dlp && rm -rf /var/lib/apt/lists/*
 
-COPY --from=build /floopy/target/release/floopy .
+COPY --from=builder /floopy/target/release/floopy /usr/local/bin/floopy
+COPY Cargo.lock /
 
-CMD ["./floopy"]
+CMD ["/usr/local/bin/floopy"]

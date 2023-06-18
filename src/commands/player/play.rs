@@ -1,98 +1,88 @@
-use std::sync::Arc;
-
 use humantime::format_duration;
 
-use poise::serenity_prelude::Color;
-use serenity::{async_trait, model::id::GuildId};
-use songbird::{
-	input::{Input, Restartable},
-	Event, EventContext, EventHandler as VoiceEventHandler, Songbird, TrackEvent,
-};
+use serenity_feature_only::builder::CreateEmbed;
+use songbird::input::{Compose, Input, YoutubeDl};
 
-use crate::{shared::join_channel, FloopyContext, FloopyError};
-use url::Url;
+use crate::{
+	commands::base_embed,
+	metadata::AuxMetadataKey,
+	shared::enter_vc,
+	structs::{CommandResult, Context},
+};
 
 /// Plays a song.
 #[poise::command(
+	category = "Player",
 	prefix_command,
 	slash_command,
 	ephemeral = true,
 	rename = "play",
 	aliases("p", "pl"),
-	guild_only
+	guild_only,
+	member_cooldown = 5
 )]
 pub async fn command(
-	ctx: FloopyContext<'_>,
+	ctx: Context<'_>,
 	#[description = "The song to play"]
 	#[rest]
 	query: String,
-) -> Result<(), FloopyError> {
+) -> CommandResult {
 	ctx.defer().await?;
 
-	let (guild_id, channel_id, conn, manager) = join_channel(&ctx).await?;
+	enter_vc(ctx, false, |conn, ctx| async move {
+		let reqwest = ctx.data().reqwest.clone();
+		let mut source = YoutubeDl::new(reqwest, query);
 
-	let source: Input = if let Ok(url) = Url::parse(&query) {
-		Restartable::ytdl(url, true).await?.into()
-	} else {
-		Restartable::ytdl_search(query, true).await?.into()
-	};
+		let channel_id = ctx.channel_id();
+		let metadata = source.aux_metadata().await?;
+		let handle = conn.lock().await.enqueue_input(Input::from(source)).await;
 
-	let metadata = source.metadata.clone();
+		// To provent the bot from earaping people
+		let _ = handle.set_volume(0.5);
 
-	let handle = conn.lock().await.enqueue_source(source);
+		let mut typemap = handle.typemap().write().await;
+		typemap.insert::<AuxMetadataKey>(metadata.clone());
 
-	let _ = handle.add_event(
-		Event::Track(TrackEvent::End),
-		EndLeaver { manager, guild_id },
-	);
+		ctx.send({
+			let builder = poise::CreateReply::default();
 
-	ctx.send(|r| {
-		r.embed(|e| {
-			e.color(Color::BLURPLE)
-				.title(format!("Queueing audio in <#{channel_id}>"));
-
-			if let Some(title) = &metadata.title {
-				e.field("Title", title, false);
-			} else if let Some(track) = &metadata.track {
-				e.field("Title", track, false);
-			}
-
-			if let Some(duration) = &metadata.duration {
-				e.field("Duration", format_duration(*duration), true);
-			}
-
-			if let Some(source_url) = &metadata.source_url {
-				e.field("Source", format!("[Open original]({source_url})"), true);
-			}
-
-			if let Some(thumbnail) = &metadata.thumbnail {
-				e.thumbnail(thumbnail);
-			}
-
-			e
+			builder.embed(
+				base_embed(CreateEmbed::default())
+					.title(format!("Queueing audio in <#{channel_id}>"))
+					.field(
+						"Title",
+						if metadata.title.is_some() {
+							metadata.title.unwrap()
+						} else {
+							metadata.track.unwrap()
+						},
+						false,
+					)
+					.field(
+						"Duration",
+						if metadata.duration.is_some() {
+							format_duration(metadata.duration.unwrap()).to_string()
+						} else {
+							"∞".to_string()
+						},
+						true,
+					)
+					.field(
+						"Source",
+						format!(
+							"[Open original]({})",
+							metadata.source_url.unwrap_or(
+								"https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string()
+							)
+						),
+						true,
+					)
+					.thumbnail(metadata.thumbnail.unwrap()),
+			)
 		})
+		.await?;
+
+		return Ok(());
 	})
-	.await?;
-
-	return Ok(());
-}
-
-struct EndLeaver {
-	pub manager: Arc<Songbird>,
-	pub guild_id: GuildId,
-}
-
-#[async_trait]
-impl VoiceEventHandler for EndLeaver {
-	async fn act(&self, _ctx: &EventContext<'_>) -> Option<Event> {
-		if let Some(conn) = self.manager.get(self.guild_id) {
-			let should_remove = conn.lock().await.queue().is_empty();
-			if should_remove {
-				if let Err(err) = self.manager.remove(self.guild_id).await {
-					eprintln!("Failed to leave after track end: {err}");
-				}
-			}
-		}
-		None
-	}
+	.await
 }

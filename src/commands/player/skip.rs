@@ -1,4 +1,7 @@
-use crate::{shared::get_conn, FloopyContext, FloopyError};
+use crate::{
+	shared::enter_vc,
+	structs::{CommandResult, Context},
+};
 
 /// Skips the current song.
 #[poise::command(
@@ -7,22 +10,28 @@ use crate::{shared::get_conn, FloopyContext, FloopyError};
 	ephemeral = true,
 	rename = "skip",
 	guild_only,
-	aliases("s")
+	aliases("s"),
+	category = "Player",
+	member_cooldown = 5
 )]
-pub async fn command(ctx: FloopyContext<'_>) -> Result<(), FloopyError> {
+pub async fn command(ctx: Context<'_>) -> CommandResult {
 	ctx.defer().await?;
 
-	let conn = get_conn(&ctx).await?;
-	let driver = conn.lock().await;
+	enter_vc(ctx, false, |conn, ctx| async move {
+		let driver = conn.lock().await;
 
-	if driver.queue().is_empty() {
-		ctx.send(|r| r.content("There is no song to skip.")).await?;
+		if driver.queue().is_empty() {
+			ctx.send(poise::CreateReply::default().content("There is no song to skip."))
+				.await?;
+			return Ok(());
+		}
+
+		let _ = driver.queue().skip();
+
+		ctx.send(poise::CreateReply::default().content("Skipped the current song."))
+			.await?;
+
 		return Ok(());
-	}
-
-	let _ = driver.queue().skip();
-
-	ctx.send(|r| r.content("Skipped the current song.")).await?;
-
-	return Ok(());
+	})
+	.await
 }

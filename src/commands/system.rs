@@ -1,4 +1,9 @@
-use crate::{base_embed, constants::DOT, FloopyContext, FloopyError};
+use crate::{
+	base_embed,
+	constants::DOT,
+	structs::{CommandResult, Context},
+};
+use serenity_feature_only::builder::CreateEmbed;
 use sysinfo::{ProcessExt, System, SystemExt};
 
 /// Shows some information about the system.
@@ -8,7 +13,7 @@ use sysinfo::{ProcessExt, System, SystemExt};
 	rename = "system",
 	aliases("sys", "system_info", "sys_info")
 )]
-pub async fn command(ctx: FloopyContext<'_>) -> Result<(), FloopyError> {
+pub async fn command(ctx: Context<'_>) -> CommandResult {
 	let mut sys = System::new_all();
 
 	sys.refresh_memory();
@@ -23,20 +28,14 @@ pub async fn command(ctx: FloopyContext<'_>) -> Result<(), FloopyError> {
 				process.start_time()
 			);
 
-			ctx.send(|r| {
-				r.embed(|e| {
-					base_embed(e)
+			ctx.send(
+				poise::CreateReply::default().embed(
+					base_embed(CreateEmbed::default())
 						.title("System Info")
 						.description(process_info)
-						.thumbnail(
-							ctx.serenity_context()
-								.cache
-								.current_user()
-								.avatar_url()
-								.unwrap(),
-						)
-				})
-			})
+						.thumbnail(ctx.author().avatar_url().unwrap()),
+				),
+			)
 			.await?;
 		}
 	}

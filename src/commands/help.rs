@@ -1,4 +1,4 @@
-use crate::{FloopyContext, FloopyError};
+use crate::structs::{CommandResult, Context};
 
 /// Shows a list of commands or help for a specific command.
 #[poise::command(
@@ -9,11 +9,11 @@ use crate::{FloopyContext, FloopyError};
 	aliases("h")
 )]
 pub async fn command(
-	ctx: FloopyContext<'_>,
+	ctx: Context<'_>,
 	#[description = "Specific command to show help about"]
 	#[autocomplete = "poise::builtins::autocomplete_command"]
 	command: Option<String>,
-) -> Result<(), FloopyError> {
+) -> CommandResult {
 	let bottom_text = format!(
 		"\
 Type {}help command for more info on a command.

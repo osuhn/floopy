@@ -1,6 +1,6 @@
 use crate::{
-	shared::{get_conn, leave_channel},
-	FloopyContext, FloopyError,
+	shared::{enter_vc, leave_channel},
+	structs::{CommandResult, Context},
 };
 
 /// Leaves the current voice channel.
@@ -10,29 +10,36 @@ use crate::{
 	ephemeral = true,
 	rename = "leave",
 	guild_only,
-	aliases("stop")
+	aliases("stop"),
+	category = "Player",
+	member_cooldown = 5
 )]
-pub async fn command(ctx: FloopyContext<'_>) -> Result<(), FloopyError> {
+pub async fn command(ctx: Context<'_>) -> CommandResult {
 	ctx.defer().await?;
 
-	let conn = get_conn(&ctx).await?;
-
-	if !conn.lock().await.queue().is_empty() {
-		let _ = conn.lock().await.queue().stop();
-	}
-
-	match leave_channel(&ctx).await {
-		Ok(_) => {
-			ctx.send(|r| r.content("I left the voice channel")).await?;
-
-			return Ok(());
+	enter_vc(ctx, false, |conn, ctx| async move {
+		if !conn.lock().await.queue().is_empty() {
+			let _ = conn.lock().await.queue().stop();
 		}
 
-		Err(_) => {
-			ctx.send(|r| r.content("An error occurred while trying to leave channel."))
+		match leave_channel(&ctx).await {
+			Ok(_) => {
+				ctx.send(poise::CreateReply::default().content("I left the voice channel"))
+					.await?;
+
+				return Ok(());
+			}
+
+			Err(_) => {
+				ctx.send(
+					poise::CreateReply::default()
+						.content("An error occurred while trying to leave channel."),
+				)
 				.await?;
 
-			return Err(FloopyError::from("error"));
+				return Ok(());
+			}
 		}
-	}
+	})
+	.await
 }

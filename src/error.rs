@@ -1,5 +1,5 @@
 use poise::serenity_prelude;
-use songbird::{error::JoinError as SongbirdJoinError, input::error::Error as SongbirdInputError};
+use songbird::error::JoinError as SongbirdJoinError;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -17,6 +17,10 @@ pub struct NoVoiceChannelIdError;
 #[derive(Debug, Error)]
 #[error("Songbird hasn't been initialized (this is a bug)")]
 pub struct NoSongbirdError;
+
+#[derive(Debug, Error)]
+#[error("Already in a voice channel")]
+pub struct AlreadyInVoiceChannelError;
 
 #[derive(Debug, Error)]
 pub enum Error {
@@ -39,5 +43,5 @@ pub enum Error {
 	SongbirdJoin(#[from] SongbirdJoinError),
 
 	#[error(transparent)]
-	SongbirdInput(#[from] SongbirdInputError),
+	AlreadyInVoiceChannel(#[from] AlreadyInVoiceChannelError),
 }

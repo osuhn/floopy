@@ -433,7 +433,6 @@ dependencies = [
  "anyhow",
  "dashmap",
  "dotenv",
- "gnomeutils",
  "humantime",
  "log",
  "poise",
@@ -625,21 +624,6 @@ dependencies = [
  "libc",
  "wasi",
  "wasm-bindgen",
-]
-
-[[package]]
-name = "gnomeutils"
-version = "0.1.0"
-source = "git+https://github.com/GnomedDev/GnomeUtils?branch=personal#148575500754a976569bc8a5d68f362923d29bae"
-dependencies = [
- "anyhow",
- "async-trait",
- "indexmap",
- "poise",
- "songbird",
- "strsim",
- "tokio",
- "tracing",
 ]
 
 [[package]]

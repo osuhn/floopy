@@ -38,8 +38,8 @@ pub async fn leave_channel(ctx: &Context<'_>) -> Result<(GuildId, ChannelId), Er
 	Ok((guild_id, ChannelId(channel_id.0)))
 }
 
-async fn is_track_playing(queue: &Arc<TrackQueue>) -> bool {
-	if let Some(handler) = queue.current_queue().first() {
+pub async fn is_track_playing(queue: &TrackQueue) -> bool {
+	if let Some(handler) = queue.current() {
 		if let Ok(info) = handler.get_info().await {
 			return info.playing == PlayMode::Play;
 		}

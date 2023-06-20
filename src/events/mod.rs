@@ -8,8 +8,6 @@ use crate::structs::{FrameworkContext, Result};
 use ready::*;
 
 pub async fn listen(framework_ctx: FrameworkContext<'_>, event: &Event) -> Result<()> {
-	let data = framework_ctx.user_data;
-
 	match event {
 		Event::Ready {
 			ctx,

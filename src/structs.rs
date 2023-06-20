@@ -19,8 +19,8 @@ pub struct DataInner {
 
 pub type Command = poise::Command<Data, CommandError>;
 pub type Context<'a> = poise::Context<'a, Data, CommandError>;
-pub type PrefixContext<'a> = poise::PrefixContext<'a, Data, CommandError>;
-pub type ApplicationContext<'a> = poise::ApplicationContext<'a, Data, CommandError>;
+// pub type PrefixContext<'a> = poise::PrefixContext<'a, Data, CommandError>;
+// pub type ApplicationContext<'a> = poise::ApplicationContext<'a, Data, CommandError>;
 
 pub type CommandError = Error;
 pub type CommandResult<E = Error> = Result<(), E>;

@@ -1,4 +1,7 @@
+use serenity_feature_only::builder::CreateEmbed;
+
 use crate::{
+	commands::error_embed,
 	shared::enter_vc,
 	structs::{CommandResult, Context},
 };
@@ -17,6 +20,8 @@ use crate::{
 pub async fn command(
 	ctx: Context<'_>,
 	#[description = "Times to loop the current song. If not specified, loops indefinitely."]
+	#[min = 1]
+	#[max = 100]
 	#[lazy]
 	times: Option<usize>,
 ) -> CommandResult {
@@ -24,12 +29,14 @@ pub async fn command(
 
 	enter_vc(ctx, false, |conn, ctx| async move {
 		if conn.lock().await.queue().is_empty() {
-			ctx.send(poise::CreateReply::default().content("There is nothing to loop!"))
-				.await?;
+			ctx.send(poise::CreateReply::default().embed(
+				error_embed(CreateEmbed::default()).description("There is nothing to loop!"),
+			))
+			.await?;
 			return Ok(());
 		}
 
-		if times.is_some() && times.unwrap() != 0 {
+		if times.is_some() {
 			let _ = conn
 				.lock()
 				.await
@@ -43,6 +50,7 @@ pub async fn command(
 					.content(format!("Looping for {} times.", times.unwrap())),
 			)
 			.await?;
+
 			return Ok(());
 		}
 

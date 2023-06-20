@@ -1,4 +1,7 @@
+use serenity_feature_only::builder::CreateEmbed;
+
 use crate::{
+	commands::error_embed,
 	shared::enter_vc,
 	structs::{CommandResult, Context},
 };
@@ -21,8 +24,10 @@ pub async fn command(ctx: Context<'_>) -> CommandResult {
 		let driver = conn.lock().await;
 
 		if driver.queue().is_empty() {
-			ctx.send(poise::CreateReply::default().content("There is no song to skip."))
-				.await?;
+			ctx.send(poise::CreateReply::default().embed(
+				error_embed(CreateEmbed::default()).description("There is no song to skip."),
+			))
+			.await?;
 			return Ok(());
 		}
 

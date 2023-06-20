@@ -1,4 +1,7 @@
+use serenity_feature_only::builder::CreateEmbed;
+
 use crate::{
+	commands::error_embed,
 	shared::{enter_vc, leave_channel},
 	structs::{CommandResult, Context},
 };
@@ -33,7 +36,9 @@ pub async fn command(ctx: Context<'_>) -> CommandResult {
 			Err(_) => {
 				ctx.send(
 					poise::CreateReply::default()
-						.content("An error occurred while trying to leave channel."),
+						.embed(error_embed(CreateEmbed::default().description(
+							"An error occurred while trying to leave channel.",
+						))),
 				)
 				.await?;
 

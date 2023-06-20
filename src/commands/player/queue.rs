@@ -1,4 +1,5 @@
 use crate::{
+	commands::error_embed,
 	metadata::{format_duration, format_metadata, AuxMetadataKey},
 	shared::enter_vc,
 	structs::{CommandError, CommandResult, Context},
@@ -14,6 +15,7 @@ use serenity::{
 	prelude::Mutex, ComponentInteractionCollector, CreateActionRow, CreateButton,
 	CreateInteractionResponse, EditMessage, Message, ReactionType,
 };
+use serenity_feature_only::builder::CreateEmbed;
 use songbird::Call;
 use tokio::spawn;
 use tokio::time::timeout;
@@ -160,7 +162,11 @@ pub async fn command(
 
 		if hlock.queue().is_empty() {
 			drop(hlock);
-			ctx.say("queue is empty").await?;
+			ctx.send(
+				poise::CreateReply::default()
+					.embed(error_embed(CreateEmbed::default()).description("queue is empty")),
+			)
+			.await?;
 			return Ok(());
 		}
 		let text = retrieve_queue(&hlock, page).await;

@@ -18,6 +18,10 @@ pub fn base_embed(e: CreateEmbed) -> CreateEmbed {
 	e.color::<Color>(Color::BLURPLE)
 }
 
+pub fn error_embed(e: CreateEmbed) -> CreateEmbed {
+	e.color::<Color>(Color::RED).title("Error!")
+}
+
 pub fn commands() -> Vec<Command> {
 	[
 		register(),

@@ -1,19 +1,20 @@
-use std::time::SystemTime;
+use crate::structs::{CommandResult, Context};
 
-use crate::{FloopyContext, FloopyError};
-
-#[poise::command(slash_command)]
-pub async fn ping(ctx: FloopyContext<'_>) -> Result<(), FloopyError> {
-	let initial = SystemTime::now();
-
-	let reply = ctx.send(|f| f.content("Pong!")).await?;
-
-	let elapsed = initial.elapsed().unwrap();
+/// Ping the bot.
+#[poise::command(slash_command, prefix_command, rename = "ping", aliases("latency"))]
+pub async fn command(ctx: Context<'_>) -> CommandResult {
+	let initial = ctx.created_at().timestamp_millis();
+	let reply = ctx
+		.send(poise::CreateReply::default().content("Pong!"))
+		.await?;
+	let end = reply.message().await.unwrap().timestamp.timestamp_millis();
+	let elapsed = end - initial;
 
 	reply
-		.edit(ctx, |m| {
-			m.content(format!("Pong! Took {}ms", elapsed.as_millis()))
-		})
+		.edit(
+			ctx,
+			poise::CreateReply::default().content(format!("Pong! Took {}ms", elapsed)),
+		)
 		.await?;
 
 	Ok(())

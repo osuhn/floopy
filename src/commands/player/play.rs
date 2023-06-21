@@ -6,7 +6,7 @@ use songbird::input::{Compose, Input, YoutubeDl};
 use crate::{
 	commands::base_embed,
 	metadata::AuxMetadataKey,
-	shared::enter_vc,
+	shared::{enter_vc, is_url},
 	structs::{CommandResult, Context},
 };
 
@@ -29,7 +29,11 @@ pub async fn command(
 ) -> CommandResult {
 	ctx.defer().await?;
 	let reqwest = ctx.data().reqwest.clone();
-	let mut source = YoutubeDl::new(reqwest, query);
+	let mut source = if is_url(&query) {
+		YoutubeDl::new(reqwest, query)
+	} else {
+		YoutubeDl::new(reqwest, format!("ytsearch1:{}", query))
+	};
 
 	enter_vc(ctx, true, |conn, ctx| async move {
 		println!("source: {:?}", source);

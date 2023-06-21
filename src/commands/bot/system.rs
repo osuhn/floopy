@@ -23,10 +23,11 @@ pub async fn command(ctx: Context<'_>) -> CommandResult {
 	if let Ok(pid) = sysinfo::get_current_pid() {
 		if let Some(process) = sys.process(pid) {
 			let process_info = format!(
-				"> {DOT} Memory Usage: **{}**\n> {DOT} CPU Usage: **{}%**\n> {DOT} Woke up: **<t:{}:R>**",
+				"> {DOT} Memory Usage: **{}**\n> {DOT} CPU Usage: **{}%**\n> {DOT} Woke up: **<t:{}:R>**\n> {DOT} Disk Usage: **{}**",
 				format_bytes(process.memory()),
 				process.cpu_usage().round(),
-				process.start_time()
+				process.start_time(),
+                format_bytes(process.disk_usage().read_bytes)
 			);
 
 			ctx.send(

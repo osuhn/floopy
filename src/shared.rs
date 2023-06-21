@@ -1,9 +1,10 @@
-use std::{future::Future, sync::Arc};
+use std::{future::Future, ptr::eq, sync::Arc};
 
 use poise::serenity_prelude as serenity;
 use serenity::model::id::{ChannelId, GuildId};
 use songbird::Call;
 use tokio::sync::Mutex;
+use url::Url;
 
 use crate::{
 	error::{AlreadyInVoiceChannelError, Error, NoSongbirdError},
@@ -120,4 +121,15 @@ pub async fn enter_vc<
 	};
 
 	f(handler_lock, ctx).await
+}
+
+pub fn is_url(url: &String) -> bool {
+	let url = match Url::parse(url.as_str()) {
+		Ok(url) => url,
+		Err(_) => return false,
+	};
+
+	let urls = vec!["youtube.com", "youtu.be"];
+
+	urls.iter().any(|x| url.host_str().unwrap().contains(x))
 }

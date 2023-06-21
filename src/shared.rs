@@ -2,10 +2,7 @@ use std::{future::Future, sync::Arc};
 
 use poise::serenity_prelude as serenity;
 use serenity::model::id::{ChannelId, GuildId};
-use songbird::{
-	tracks::{PlayMode, TrackQueue},
-	Call,
-};
+use songbird::Call;
 use tokio::sync::Mutex;
 
 use crate::{
@@ -36,15 +33,6 @@ pub async fn leave_channel(ctx: &Context<'_>) -> Result<(GuildId, ChannelId), Er
 	};
 
 	Ok((guild_id, ChannelId(channel_id.0)))
-}
-
-pub async fn is_track_playing(queue: &TrackQueue) -> bool {
-	if let Some(handler) = queue.current() {
-		if let Ok(info) = handler.get_info().await {
-			return info.playing == PlayMode::Play;
-		}
-	}
-	false
 }
 
 pub async fn try_join(ctx: Context<'_>, must_join: bool) -> Result<Arc<Mutex<Call>>, Error> {

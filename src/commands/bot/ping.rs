@@ -1,7 +1,13 @@
 use crate::structs::{CommandResult, Context};
 
 /// Ping the bot.
-#[poise::command(slash_command, prefix_command, rename = "ping", aliases("latency"))]
+#[poise::command(
+	slash_command,
+	prefix_command,
+	rename = "ping",
+	aliases("latency"),
+	category = "Bot"
+)]
 pub async fn command(ctx: Context<'_>) -> CommandResult {
 	let initial = ctx.created_at().timestamp_millis();
 	let reply = ctx

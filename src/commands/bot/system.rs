@@ -11,7 +11,8 @@ use sysinfo::{ProcessExt, System, SystemExt};
 	slash_command,
 	prefix_command,
 	rename = "system",
-	aliases("sys", "system_info", "sys_info")
+	aliases("sys", "system_info", "sys_info"),
+	category = "Bot"
 )]
 pub async fn command(ctx: Context<'_>) -> CommandResult {
 	let mut sys = System::new_all();

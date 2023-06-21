@@ -28,15 +28,15 @@ pub async fn command(
 	query: String,
 ) -> CommandResult {
 	ctx.defer().await?;
-	let reqwest = ctx.data().reqwest.clone();
-	let mut source = if is_url(&query) {
-		YoutubeDl::new(reqwest, query)
-	} else {
-		YoutubeDl::new(reqwest, format!("ytsearch1:{}", query))
-	};
 
 	enter_vc(ctx, true, |conn, ctx| async move {
-		println!("source: {:?}", source);
+		let reqwest = ctx.data().reqwest.clone();
+		let mut source = if is_url(&query) {
+			YoutubeDl::new(reqwest, query)
+		} else {
+			YoutubeDl::new(reqwest, format!("ytsearch1:{}", query))
+		};
+
 		let channel_id = ctx.channel_id();
 		let metadata = source.aux_metadata().await?;
 		let handle = conn.lock().await.enqueue_input(Input::from(source)).await;

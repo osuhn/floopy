@@ -6,7 +6,7 @@ use crate::{
 	structs::{CommandResult, Context},
 };
 
-/// Leaves the current voice channel.
+/// Display or set the volume of the player.
 #[poise::command(
 	prefix_command,
 	slash_command,
@@ -22,13 +22,11 @@ pub async fn command(
 	#[description = "The volume to set the player to. Must be between 10 and 100."]
 	#[min = 10]
 	#[max = 100]
-	volume: f32,
+	volume: Option<f32>,
 ) -> CommandResult {
 	ctx.defer().await?;
 
 	enter_vc(ctx, false, |conn, ctx| async move {
-		//
-
 		let track = match conn.lock().await.queue().current() {
 			Some(track) => track,
 			None => {
@@ -44,11 +42,35 @@ pub async fn command(
 			}
 		};
 
-		let _ = track.set_volume(volume / 100.0);
+		if let Some(vol) = volume {
+			let _ = track.set_volume(vol / 100.0);
 
-		ctx.send(poise::CreateReply::default().embed(
-			base_embed(CreateEmbed::default()).description(format!("Volume set to {volume}%.")),
-		))
+			ctx.send(poise::CreateReply::default().embed(
+				base_embed(CreateEmbed::default()).description(format!("Volume set to {vol}%.")),
+			))
+			.await?;
+
+			return Ok(());
+		}
+
+		if let Ok(track_info) = track.get_info().await {
+			let vol = track_info.volume * 100.0;
+			ctx.send(
+				poise::CreateReply::default().embed(
+					base_embed(CreateEmbed::default())
+						.description(format!("Current volume is {vol}%",)),
+				),
+			)
+			.await?;
+
+			return Ok(());
+		}
+
+		ctx.send(
+			poise::CreateReply::default().embed(
+				error_embed(CreateEmbed::default()).description("Failed to get track info."),
+			),
+		)
 		.await?;
 
 		Ok(())

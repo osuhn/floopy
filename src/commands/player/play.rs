@@ -109,7 +109,11 @@ fn get_time(url: &str) -> Option<Duration> {
 		if !params.is_empty() {
 			let time_str = params[0].split('=').collect::<Vec<&str>>()[1];
 
-			time = Some(Duration::new(time_str.parse().unwrap(), 0));
+			if let Ok(time_parsed) = time_str.parse::<u64>() {
+				return Some(Duration::new(time_parsed, 0));
+			};
+
+			time = Some(Duration::new(0, 0));
 		}
 	}
 

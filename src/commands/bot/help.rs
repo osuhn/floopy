@@ -7,7 +7,7 @@ use crate::structs::{CommandResult, Context};
 	rename = "help",
 	track_edits,
 	aliases("h"),
-	category = "Bot",
+	category = "Bot"
 )]
 pub async fn command(
 	ctx: Context<'_>,

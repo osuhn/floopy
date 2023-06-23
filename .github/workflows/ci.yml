@@ -33,8 +33,8 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-
-      - name: Prisma Generate
-        run: cargo prisma generate
+      # - name: Prisma Generate
+      #   run: cargo prisma generate
       - name: Lint
         run: |
           cargo fmt --all -- --check

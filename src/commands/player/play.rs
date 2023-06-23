@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use humantime::format_duration;
 
 use serenity_feature_only::builder::CreateEmbed;
@@ -31,6 +33,7 @@ pub async fn command(
 
 	enter_vc(ctx, true, |conn, ctx| async move {
 		let reqwest = ctx.data().reqwest.clone();
+		let time = get_time(&query);
 		let mut source = if is_url(&query) {
 			YoutubeDl::new(reqwest, query)
 		} else {
@@ -43,6 +46,12 @@ pub async fn command(
 
 		// To provent the bot from earaping people
 		let _ = handle.set_volume(0.5);
+		match time {
+			Some(time) => {
+				let _ = handle.seek(time);
+			}
+			None => {}
+		}
 
 		let mut typemap = handle.typemap().write().await;
 		typemap.insert::<AuxMetadataKey>(metadata.clone());
@@ -89,4 +98,23 @@ pub async fn command(
 		return Ok(());
 	})
 	.await
+}
+
+fn get_time(url: &String) -> Option<Duration> {
+	let url = url.split('?').collect::<Vec<&str>>();
+	let mut time = None;
+
+	if url.len() > 1 {
+		let mut params = url[1].split('&').collect::<Vec<&str>>();
+
+		params.retain(|param| param.starts_with("t="));
+
+		if params.len() > 0 {
+			let time_str = params[0].split('=').collect::<Vec<&str>>()[1];
+
+			time = Some(Duration::new(time_str.parse().unwrap(), 0));
+		}
+	}
+
+	return time;
 }

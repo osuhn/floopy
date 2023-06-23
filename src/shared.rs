@@ -1,4 +1,4 @@
-use std::{future::Future, ptr::eq, sync::Arc};
+use std::{future::Future, sync::Arc};
 
 use poise::serenity_prelude as serenity;
 use serenity::model::id::{ChannelId, GuildId};

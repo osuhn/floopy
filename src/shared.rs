@@ -123,8 +123,8 @@ pub async fn enter_vc<
 	f(handler_lock, ctx).await
 }
 
-pub fn is_url(url: &String) -> bool {
-	let url = match Url::parse(url.as_str()) {
+pub fn is_url(url: &str) -> bool {
+	let url = match Url::parse(url) {
 		Ok(url) => url,
 		Err(_) => return false,
 	};

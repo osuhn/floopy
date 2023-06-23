@@ -36,7 +36,7 @@ pub async fn command(ctx: Context<'_>) -> CommandResult {
 		ctx.send(poise::CreateReply::default().content("Skipped the current song."))
 			.await?;
 
-		return Ok(());
+		Ok(())
 	})
 	.await
 }

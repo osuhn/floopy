@@ -46,7 +46,7 @@ async fn _main() -> Result<()> {
 		commands: commands::commands(),
 		listener: |event, ctx, _| Box::pin(events::listen(ctx, event)),
 		prefix_options: poise::PrefixFrameworkOptions {
-			prefix: Some(var("DISCORD_PREFIX").unwrap_or(";".to_string()).into()),
+			prefix: Some(var("DISCORD_PREFIX").unwrap_or(";".to_owned())),
 			edit_tracker: Some(poise::EditTracker::for_timespan(
 				std::time::Duration::from_secs(3600),
 			)),

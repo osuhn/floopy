@@ -22,7 +22,7 @@ pub async fn command(ctx: Context<'_>) -> CommandResult {
 
 	enter_vc(ctx, false, |conn, ctx| async move {
 		if !conn.lock().await.queue().is_empty() {
-			let _ = conn.lock().await.queue().stop();
+			conn.lock().await.queue().stop();
 		}
 
 		match leave_channel(&ctx).await {
@@ -30,7 +30,7 @@ pub async fn command(ctx: Context<'_>) -> CommandResult {
 				ctx.send(poise::CreateReply::default().content("I left the voice channel"))
 					.await?;
 
-				return Ok(());
+				Ok(())
 			}
 
 			Err(_) => {
@@ -42,7 +42,7 @@ pub async fn command(ctx: Context<'_>) -> CommandResult {
 				)
 				.await?;
 
-				return Ok(());
+				Ok(())
 			}
 		}
 	})

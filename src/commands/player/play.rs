@@ -33,7 +33,7 @@ pub async fn command(
 
 	enter_vc(ctx, true, |conn, ctx| async move {
 		let reqwest = ctx.data().reqwest.clone();
-		let time = get_time(&query);
+		let time = get_time(query.as_str());
 		let mut source = if is_url(&query) {
 			YoutubeDl::new(reqwest, query)
 		} else {
@@ -46,11 +46,8 @@ pub async fn command(
 
 		// To provent the bot from earaping people
 		let _ = handle.set_volume(0.5);
-		match time {
-			Some(time) => {
-				let _ = handle.seek(time);
-			}
-			None => {}
+		if let Some(time) = time {
+			let _ = handle.seek(time);
 		}
 
 		let mut typemap = handle.typemap().write().await;
@@ -64,8 +61,8 @@ pub async fn command(
 					.title(format!("Queueing audio in <#{channel_id}>"))
 					.field(
 						"Title",
-						if metadata.title.is_some() {
-							metadata.title.unwrap()
+						if let Some(title) = metadata.title {
+							title
 						} else {
 							metadata.track.unwrap()
 						},
@@ -73,10 +70,10 @@ pub async fn command(
 					)
 					.field(
 						"Duration",
-						if metadata.duration.is_some() {
-							format_duration(metadata.duration.unwrap()).to_string()
+						if let Some(duration) = metadata.duration {
+							format_duration(duration).to_string()
 						} else {
-							"∞".to_string()
+							"∞".to_owned()
 						},
 						true,
 					)
@@ -95,12 +92,12 @@ pub async fn command(
 		})
 		.await?;
 
-		return Ok(());
+		Ok(())
 	})
 	.await
 }
 
-fn get_time(url: &String) -> Option<Duration> {
+fn get_time(url: &str) -> Option<Duration> {
 	let url = url.split('?').collect::<Vec<&str>>();
 	let mut time = None;
 
@@ -109,12 +106,12 @@ fn get_time(url: &String) -> Option<Duration> {
 
 		params.retain(|param| param.starts_with("t="));
 
-		if params.len() > 0 {
+		if !params.is_empty() {
 			let time_str = params[0].split('=').collect::<Vec<&str>>()[1];
 
 			time = Some(Duration::new(time_str.parse().unwrap(), 0));
 		}
 	}
 
-	return time;
+	time
 }

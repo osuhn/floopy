@@ -23,7 +23,7 @@ You can edit your message to the bot and the bot will edit its response.",
 	);
 
 	let config = poise::builtins::HelpConfiguration {
-		extra_text_at_bottom: &bottom_text.as_str(),
+		extra_text_at_bottom: bottom_text.as_str(),
 		..Default::default()
 	};
 

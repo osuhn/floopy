@@ -36,18 +36,11 @@ pub async fn command(
 			return Ok(());
 		}
 
-		if times.is_some() {
-			let _ = conn
-				.lock()
-				.await
-				.queue()
-				.current()
-				.unwrap()
-				.loop_for(times.unwrap());
+		if let Some(times) = times {
+			let _ = conn.lock().await.queue().current().unwrap().loop_for(times);
 
 			ctx.send(
-				poise::CreateReply::default()
-					.content(format!("Looping for {} times.", times.unwrap())),
+				poise::CreateReply::default().content(format!("Looping for {} times.", times)),
 			)
 			.await?;
 

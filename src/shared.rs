@@ -69,6 +69,9 @@ pub async fn try_join(ctx: Context<'_>, must_join: bool) -> Result<Arc<Mutex<Cal
 		.await
 		.map_err(|_x| NoSongbirdError)?;
 
+	// why not
+	let _ = handler.lock().await.deafen(true);
+
 	handler.lock().await.add_global_event(
 		songbird::Event::Track(songbird::TrackEvent::Error),
 		ErrorHandler,

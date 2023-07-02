@@ -1,6 +1,6 @@
 use crate::structs::{CommandResult, Context};
 
-/// Shows a list of commands or help for a specific command.
+/// List the servers the bot is in.
 #[poise::command(
 	slash_command,
 	prefix_command,

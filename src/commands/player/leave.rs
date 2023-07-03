@@ -21,9 +21,12 @@ pub async fn command(ctx: Context<'_>) -> CommandResult {
 	ctx.defer().await?;
 
 	enter_vc(ctx, false, |conn, ctx| async move {
-		if !conn.lock().await.queue().is_empty() {
-			conn.lock().await.queue().stop();
+		let lock = conn.lock().await;
+		if !lock.queue().is_empty() {
+			lock.queue().stop();
 		}
+
+		drop(lock);
 
 		match leave_channel(&ctx).await {
 			Ok(_) => {

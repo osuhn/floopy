@@ -42,7 +42,10 @@ pub async fn command(
 
 		let channel_id = ctx.channel_id();
 		let metadata = source.aux_metadata().await?;
-		let handle = conn.lock().await.enqueue_input(Input::from(source)).await;
+        let mut lock = conn.lock().await;
+		let handle = lock.enqueue_input(Input::from(source)).await;
+
+        drop(lock);
 
 		// To provent the bot from earaping people
 		let _ = handle.set_volume(0.5);

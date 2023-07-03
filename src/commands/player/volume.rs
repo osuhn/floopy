@@ -27,7 +27,8 @@ pub async fn command(
 	ctx.defer().await?;
 
 	enter_vc(ctx, false, |conn, ctx| async move {
-		let track = match conn.lock().await.queue().current() {
+		let lock = conn.lock().await;
+		let track = match lock.queue().current() {
 			Some(track) => track,
 			None => {
 				ctx.send(
@@ -41,6 +42,8 @@ pub async fn command(
 				return Ok(());
 			}
 		};
+
+        drop(lock);
 
 		if let Some(vol) = volume {
 			let _ = track.set_volume(vol / 100.0);

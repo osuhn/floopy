@@ -61,3 +61,13 @@ serenity = { git = "https://github.com/GnomedDev/serenity", branch = "test-secon
 
 [patch."https://github.com/serenity-rs/serenity"]
 serenity = { git = "https://github.com/GnomedDev/serenity", branch = "test-seconds-patch" }
+
+[dev-dependencies.cargo-husky]
+version = "1"
+default-features = false # Disable features which are enabled by default
+features = [
+    "precommit-hook",
+    "run-cargo-fmt",
+    "run-cargo-test",
+    "run-cargo-clippy",
+]

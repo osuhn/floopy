@@ -21,9 +21,9 @@ pub async fn command(ctx: Context<'_>) -> CommandResult {
 	ctx.defer().await?;
 
 	enter_vc(ctx, false, |conn, ctx| async move {
-		let driver = conn.lock().await;
+		let lock = conn.lock().await;
 
-		if driver.queue().is_empty() {
+		if lock.queue().is_empty() {
 			ctx.send(poise::CreateReply::default().embed(
 				error_embed(CreateEmbed::default()).description("There is no song to skip."),
 			))
@@ -31,7 +31,8 @@ pub async fn command(ctx: Context<'_>) -> CommandResult {
 			return Ok(());
 		}
 
-		let _ = driver.queue().skip();
+		let _ = lock.queue().skip();
+        drop(lock);
 
 		ctx.send(poise::CreateReply::default().content("Skipped the current song."))
 			.await?;

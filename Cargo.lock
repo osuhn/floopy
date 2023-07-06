@@ -421,6 +421,7 @@ dependencies = [
  "humantime",
  "log",
  "poise",
+ "rand",
  "reqwest",
  "serenity",
  "songbird",

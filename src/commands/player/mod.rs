@@ -5,10 +5,11 @@ pub mod play;
 pub mod queue;
 pub mod repeat;
 pub mod seek;
+pub mod shuffle;
 pub mod skip;
 pub mod volume;
 
-pub fn commands() -> [Command; 7] {
+pub fn commands() -> [Command; 8] {
 	[
 		play::command(),
 		leave::command(),
@@ -17,5 +18,6 @@ pub fn commands() -> [Command; 7] {
 		repeat::command(),
 		volume::command(),
 		seek::command(),
+		shuffle::command(),
 	]
 }

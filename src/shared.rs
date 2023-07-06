@@ -1,12 +1,14 @@
-use std::{future::Future, sync::Arc};
+use std::{collections::VecDeque, future::Future, sync::Arc};
 
 use poise::serenity_prelude as serenity;
 use serenity::model::id::{ChannelId, GuildId};
-use songbird::Call;
+use serenity_feature_only::builder::CreateEmbed;
+use songbird::{tracks::Queued, Call};
 use tokio::sync::Mutex;
 use url::Url;
 
 use crate::{
+	commands::base_embed,
 	error::{AlreadyInVoiceChannelError, Error, NoSongbirdError},
 	events::songbird::{EndLeaver, ErrorHandler},
 	structs::{CommandResult, Context},
@@ -124,6 +126,23 @@ pub async fn enter_vc<
 	};
 
 	f(handler_lock, ctx).await
+}
+
+pub async fn queue_modify<F: FnOnce(&mut VecDeque<Queued>) -> String>(
+	ctx: Context<'_>,
+	f: F,
+) -> CommandResult {
+	enter_vc(ctx, false, |handler_lock, ctx| async move {
+		let handler = handler_lock.lock().await;
+		let m = handler.queue().modify_queue(f);
+		ctx.send(
+			poise::CreateReply::default().embed(base_embed(CreateEmbed::default()).description(m)),
+		)
+		.await?;
+
+		Ok(())
+	})
+	.await
 }
 
 pub fn is_url(url: &str) -> bool {

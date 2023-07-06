@@ -132,7 +132,7 @@ pub fn is_url(url: &str) -> bool {
 		Err(_) => return false,
 	};
 
-	let urls = vec!["youtube.com", "youtu.be"];
+	let urls = ["youtube.com", "youtu.be"];
 
 	urls.iter().any(|x| url.host_str().unwrap().contains(x))
 }

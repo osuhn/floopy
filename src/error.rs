@@ -23,6 +23,10 @@ pub struct NoSongbirdError;
 pub struct AlreadyInVoiceChannelError;
 
 #[derive(Debug, Error)]
+#[error("Time must be less or equal to {0}")]
+pub struct SeekTimeTooLargeError(pub String);
+
+#[derive(Debug, Error)]
 pub enum Error {
 	#[error(transparent)]
 	Serenity(#[from] serenity_prelude::Error),
@@ -44,4 +48,7 @@ pub enum Error {
 
 	#[error(transparent)]
 	AlreadyInVoiceChannel(#[from] AlreadyInVoiceChannelError),
+
+	#[error(transparent)]
+	SeekTimeTooLarge(#[from] SeekTimeTooLargeError),
 }

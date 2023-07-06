@@ -43,7 +43,7 @@ pub async fn command(
 			}
 		};
 
-        drop(lock);
+		drop(lock);
 
 		if let Some(vol) = volume {
 			let _ = track.set_volume(vol / 100.0);

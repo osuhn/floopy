@@ -32,7 +32,7 @@ pub async fn command(ctx: Context<'_>) -> CommandResult {
 		}
 
 		let _ = lock.queue().skip();
-        drop(lock);
+		drop(lock);
 
 		ctx.send(poise::CreateReply::default().content("Skipped the current song."))
 			.await?;

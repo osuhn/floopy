@@ -4,10 +4,11 @@ pub mod leave;
 pub mod play;
 pub mod queue;
 pub mod repeat;
+pub mod seek;
 pub mod skip;
 pub mod volume;
 
-pub fn commands() -> [Command; 6] {
+pub fn commands() -> [Command; 7] {
 	[
 		play::command(),
 		leave::command(),
@@ -15,5 +16,6 @@ pub fn commands() -> [Command; 6] {
 		skip::command(),
 		repeat::command(),
 		volume::command(),
+		seek::command(),
 	]
 }

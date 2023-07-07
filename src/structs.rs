@@ -15,6 +15,7 @@ impl std::ops::Deref for Data {
 pub struct DataInner {
 	pub songbird: Arc<songbird::Songbird>,
 	pub reqwest: reqwest::Client,
+	pub ytextract: ytextract::Client,
 }
 
 pub type Command = poise::Command<Data, CommandError>;

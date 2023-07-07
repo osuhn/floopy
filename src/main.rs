@@ -35,10 +35,12 @@ async fn _main() -> Result<()> {
 	owners.insert(serenity::UserId::new(462780441594822687));
 
 	let reqwest = reqwest::Client::new();
+	let ytextract = ytextract::Client::new();
 
 	let data = Data(Arc::new(DataInner {
 		songbird: songbird::Songbird::serenity(),
 		reqwest,
+		ytextract,
 	}));
 
 	let framework_options = poise::FrameworkOptions {

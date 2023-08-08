@@ -31,7 +31,7 @@ impl songbird::EventHandler for EndLeaver {
 		if let Some(conn) = self.manager.get(self.guild_id) {
 			let should_remove = conn.lock().await.queue().is_empty();
 			if should_remove {
-				if let Err(err) = self.manager.remove(self.guild_id).await {
+				if let Err(err) = self.manager.leave(self.guild_id).await {
 					eprintln!("Failed to leave after track end: {err}");
 				}
 			}

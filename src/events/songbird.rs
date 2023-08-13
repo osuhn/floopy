@@ -1,5 +1,5 @@
 use songbird::EventContext;
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 use poise::serenity_prelude as serenity;
 use songbird::{tracks::PlayMode, Songbird};
@@ -28,10 +28,13 @@ pub struct EndLeaver {
 #[serenity::async_trait]
 impl songbird::EventHandler for EndLeaver {
 	async fn act(&self, _ctx: &EventContext<'_>) -> Option<songbird::Event> {
+		// Just to be safe, wait 5 minutes before leaving
+		tokio::time::sleep(Duration::from_secs(5 * 60)).await;
 		if let Some(conn) = self.manager.get(self.guild_id) {
 			let should_remove = conn.lock().await.queue().is_empty();
+
 			if should_remove {
-				if let Err(err) = self.manager.leave(self.guild_id).await {
+				if let Err(err) = self.manager.remove(self.guild_id).await {
 					eprintln!("Failed to leave after track end: {err}");
 				}
 			}

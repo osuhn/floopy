@@ -54,7 +54,7 @@ package = "serenity"
 branch = "next"
 
 [dependencies.sysinfo]
-version = "0.29.7"
+version = "0.32.0"
 default-features = false
 
 [dependencies.dashmap]
